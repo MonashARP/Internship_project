@@ -1,0 +1,107 @@
+---
+title: "Data_cleaning"
+format: html
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(janitor)
+library(glue)
+```
+
+```{r}
+#| label: load-data
+
+# Load the Leads dataset
+Leads <- read_excel("data/raw/Leads.xlsx")
+View(Leads)
+
+# Load the Sales dataset
+Sales <- read_excel("data/raw/Sales.xlsx")
+View(Sales)
+
+```
+
+```{r}
+# Use 31-Dec-2024 as the first reporting week
+first_week_start <- as.Date("2024-12-31")
+
+# Create output folder for processed files
+if (!dir.exists("data/processed")) dir.create("data/processed", recursive = TRUE)
+
+```
+
+```{r}
+# Re-load RAW sheets (keep the header row)
+Leads_raw <- readxl::read_excel("data/raw/Leads.xlsx", col_names = FALSE)
+Sales_raw <- readxl::read_excel("data/raw/Sales.xlsx", col_names = FALSE)
+
+# ---- LEADS: wide -> long ----
+week_headers_leads <- as.character(unlist(Leads_raw[1, -1]))
+week_headers_leads <- make.unique(week_headers_leads)   # handle any duplicate week labels
+colnames(Leads_raw) <- c("metric", week_headers_leads)
+
+leads_long <- Leads_raw[-1, ] |>
+  tidyr::pivot_longer(
+    cols = -metric,
+    names_to = "week_label",
+    values_to = "value"
+  ) |>
+  dplyr::mutate(
+    category   = "Leads",
+    metric     = stringr::str_squish(as.character(metric)),
+    week_label = factor(week_label, levels = unique(week_headers_leads))
+  )
+
+# ---- SALES: wide -> long ----
+week_headers_sales <- as.character(unlist(Sales_raw[1, -1]))
+week_headers_sales <- make.unique(week_headers_sales)
+colnames(Sales_raw) <- c("metric", week_headers_sales)
+
+sales_long <- Sales_raw[-1, ] |>
+  tidyr::pivot_longer(
+    cols = -metric,
+    names_to = "week_label",
+    values_to = "value"
+  ) |>
+  dplyr::mutate(
+    category   = "Sales",
+    metric     = stringr::str_squish(as.character(metric)),
+    week_label = factor(week_label, levels = unique(week_headers_sales))
+  )
+
+# ---- attach dates by column position ----
+first_week_start <- as.Date("2024-12-31")
+n_weeks <- length(week_headers_leads)
+
+date_lut <- tibble::tibble(
+  week_label = factor(week_headers_leads, levels = week_headers_leads),
+  week_start = first_week_start + lubridate::weeks(0:(n_weeks - 1)),
+  week_end   = week_start + lubridate::days(6),
+  week_range = paste0(format(week_start, "%d-%m-%Y"), " - ", format(week_end, "%d-%m-%Y"))
+)
+
+leads_long <- dplyr::left_join(leads_long, date_lut, by = "week_label")
+sales_long <- dplyr::left_join(sales_long, date_lut, by = "week_label")
+
+data_long <- dplyr::bind_rows(leads_long, sales_long) |>
+  dplyr::mutate(value = suppressWarnings(as.numeric(value))) |>
+  dplyr::select(category, metric, week_start, week_end, week_range, value) |>
+  dplyr::arrange(week_start, category, metric)
+
+# write outputs
+if (!dir.exists("data/processed")) dir.create("data/processed", recursive = TRUE)
+readr::write_csv(data_long, "data/processed/leads_sales_long.csv")
+saveRDS(data_long, "data/processed/leads_sales_long.rds")
+
+# sanity check in the doc
+head(data_long, 10)
+
+
+```
+
