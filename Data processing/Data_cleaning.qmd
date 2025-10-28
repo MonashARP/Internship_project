@@ -1,0 +1,16 @@
+---
+title: "Data_cleaning"
+format: html
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(janitor)
+library(glue)
+```
+
