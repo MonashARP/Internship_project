@@ -2,7 +2,7 @@
 **DigitXL Internship (Monash University – 2025)**  
 
 This repository contains all materials developed during my three-month internship with **DigitXL**, a Melbourne-based analytics consultancy.  
-The project was completed for **Escape Haven (EH)** — a luxury wellness and retreat brand — with the goal of **building a reproducible analytics pipeline and interactive Looker Studio dashboard** to track and improve digital marketing performance.
+The project was completed for **(EH)** — a luxury wellness and retreat brand — with the goal of **building a reproducible analytics pipeline and interactive Looker Studio dashboard** to track and improve digital marketing performance.
 
 ---
 
@@ -147,7 +147,7 @@ source("scripts/03_render_report.R")
 
 ## How This Helps the Client
 
-Through this project, **Escape Haven** now has:
+Through this project, **EH** now has:
 - A **clear, data-driven view** of its lead-to-revenue funnel.  
 - A dashboard that surfaces **marketing ROI**, **channel effectiveness**, and **conversion drop-offs** in real time.  
 - A **reusable analytics framework** that DigitXL can customise for other clients.  
