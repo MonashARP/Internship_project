@@ -2,7 +2,7 @@
 **DigitXL Internship (Monash University – 2025)**  
 
 This repository contains all materials developed during my three-month internship with **DigitXL**, a Melbourne-based analytics consultancy.  
-The project was completed for **(EH)** — a luxury wellness and retreat brand — with the goal of **building a reproducible analytics pipeline and interactive Looker Studio dashboard** to track and improve digital marketing performance.
+The project was completed for **EH** — a luxury wellness and retreat brand — with the goal of **building a reproducible analytics pipeline and interactive Looker Studio dashboard** to track and improve digital marketing performance.
 
 ---
 
